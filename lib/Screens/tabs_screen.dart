@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/Data/dummy_data.dart';
-import 'package:foodapp/Providers/favourites_provider.dart';
+import 'package:foodapp/Providers/favouritesmeals_provider.dart';
 import 'package:foodapp/Screens/category_screen.dart';
 import 'package:foodapp/Screens/filters_screen.dart';
 import 'package:foodapp/widgets/tab_sc/main_drawer.dart';
 import 'package:foodapp/Screens/meals_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-const kintialFilters = {
-  Filter.glutenfree: false,
-  Filter.lactosefree: false,
-  Filter.vegeterian: false,
-  Filter.vegan: false,
-};
+import 'package:foodapp/Providers/filters_provider.dart';
 
 class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
@@ -22,7 +16,6 @@ class TabsScreen extends ConsumerStatefulWidget {
 }
 
 class _TabsScreenState extends ConsumerState<TabsScreen> {
-  Map<Filter, bool> selectedFilter = kintialFilters;
   int selectedPageIndex = 0;
   void selectPage(int index) {
     setState(() {
@@ -31,33 +24,43 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   }
 
 //for drawer
-  void selectedScreen(String identifier) async {
+  void selectedScreen(String identifier) {
     Navigator.of(context).pop();
     if (identifier == 'Filters') {
-      final result =
-          await Navigator.of(context).push<Map<Filter, bool>>(MaterialPageRoute(
-              builder: (ctx) => FiltersScreen(
-                    currentFilters: selectedFilter,
-                  )));
-      setState(() {
-        selectedFilter = result ?? kintialFilters;
-      });
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (ctx) => const FiltersScreen()));
     }
   }
+//! this code is is to store coming data from another screen while poping
+  //  void selectedScreen(String identifier) async {
+  //   Navigator.of(context).pop();
+  //   if (identifier == 'Filters') {
+  //     final result =
+  //         await Navigator.of(context).push<Map<Filter, bool>>(MaterialPageRoute(
+  //             builder: (ctx) => FiltersScreen(
+  //                   currentFilters: selectedFilter,
+  //                 )));
+  //     setState(() {
+  //       selectedFilter = result ?? kintialFilters;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
+    //!based filterprovedir dummy meels should be modified to display Meals
+    final activeFilters = ref.watch(filtersProvider);
     final avilableMeals = dummyMeals.where((meal) {
-      if (selectedFilter[Filter.glutenfree]! && !meal.isGlutenFree) {
+      if (activeFilters[Filter.glutenfree]! && !meal.isGlutenFree) {
         return false;
       }
-      if (selectedFilter[Filter.lactosefree]! && !meal.isLactoseFree) {
+      if (activeFilters[Filter.lactosefree]! && !meal.isLactoseFree) {
         return false;
       }
-      if (selectedFilter[Filter.vegeterian]! && !meal.isVegetarian) {
+      if (activeFilters[Filter.vegeterian]! && !meal.isVegetarian) {
         return false;
       }
-      if (selectedFilter[Filter.vegan]! && !meal.isVegan) {
+      if (activeFilters[Filter.vegan]! && !meal.isVegan) {
         return false;
       }
       return true;
