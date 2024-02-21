@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/Data/dummy_data.dart';
-import 'package:foodapp/Model/meal.dart';
+import 'package:foodapp/Providers/favourites_provider.dart';
 import 'package:foodapp/Screens/category_screen.dart';
 import 'package:foodapp/Screens/filters_screen.dart';
 import 'package:foodapp/widgets/tab_sc/main_drawer.dart';
 import 'package:foodapp/Screens/meals_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const kintialFilters = {
   Filter.glutenfree: false,
@@ -13,47 +14,20 @@ const kintialFilters = {
   Filter.vegan: false,
 };
 
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   Map<Filter, bool> selectedFilter = kintialFilters;
   int selectedPageIndex = 0;
   void selectPage(int index) {
     setState(() {
       selectedPageIndex = index;
     });
-  }
-
-  void showInfoMessage(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: Durations.long1,
-        content: Text(message),
-      ),
-    );
-  }
-
-  final List<Meal> favouriteMeals = [];
-  void selectFavouriteStatus(Meal meal) {
-    final isExisting = favouriteMeals.contains(meal);
-    if (isExisting) {
-      setState(() {
-        favouriteMeals.remove(meal);
-      });
-      showInfoMessage('Added to Favourite');
-    } else {
-      setState(() {
-        favouriteMeals.add(meal);
-      });
-    }
-
-    showInfoMessage('Removed from Favourite');
   }
 
 //for drawer
@@ -90,15 +64,15 @@ class _TabsScreenState extends State<TabsScreen> {
     }).toList();
 
     Widget activePage = CategoryScreen(
-      onSelectFavourite: selectFavouriteStatus,
       availbaleMeals: avilableMeals,
     );
     String activePagetitle = 'Categories';
 
     if (selectedPageIndex == 1) {
+      //! favouriteMeals wiil automaticaty store the state varaiable of provider which contain a list
+      final favouriteMeals = ref.watch(favaouriteMealsProvider);
       activePage = MealsScreen(
         filteredMeals: favouriteMeals,
-        onSelectFavourite: selectFavouriteStatus,
       );
       activePagetitle = 'Favourites';
     }

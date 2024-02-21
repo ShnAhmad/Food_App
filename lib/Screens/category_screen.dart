@@ -6,11 +6,9 @@ import 'package:foodapp/Model/meal.dart';
 class CategoryScreen extends StatelessWidget {
   const CategoryScreen({
     super.key,
-    required this.onSelectFavourite,
     required this.availbaleMeals,
   });
   final List<Meal> availbaleMeals;
-  final void Function(Meal meal) onSelectFavourite;
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +18,10 @@ class CategoryScreen extends StatelessWidget {
           .toList();
 
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (ctx) => MealsScreen(
-            filteredMeals: filteredMeals,
-            title: category.title,
-            onSelectFavourite: onSelectFavourite),
-      ));
+          builder: (ctx) => MealsScreen(
+                filteredMeals: filteredMeals,
+                title: category.title,
+              )));
     }
 
     return GridView(
