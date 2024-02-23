@@ -17,11 +17,28 @@ class CategoryScreen extends StatelessWidget {
           .where((meal) => meal.categories.contains(category.id))
           .toList();
 
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (ctx) => MealsScreen(
-                filteredMeals: filteredMeals,
-                title: category.title,
-              )));
+      // Navigator.of(context).push(MaterialPageRoute(
+      //     builder: (ctx) => MealsScreen(
+      //           filteredMeals: filteredMeals,
+      //           title: category.title,
+      //         )));
+      Navigator.of(context).push(PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => MealsScreen(
+          filteredMeals: filteredMeals,
+          title: category.title,
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      ));
     }
 
     return GridView(
